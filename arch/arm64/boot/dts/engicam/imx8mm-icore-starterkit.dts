@@ -34,8 +34,8 @@
 			compatible = "android,firmware";
 			/* default emmc node used for GSI */
 			boot_devices = "soc@0/30800000.bus/30b60000.mmc";
-			/* sd card node which used if androidboot.boot_device_root=mmcblk1 */
-			boot_devices_mmcblk1 = "soc@0/30800000.bus/30b50000.mmc";
+			/* sd card node which used if androidboot.boot_device_root=mmcblk0 */
+			boot_devices_mmcblk0 = "soc@0/30800000.bus/30b40000.mmc";
 			/* emmc node which used if androidboot.boot_device_root=mmcblk2 */
 			boot_devices_mmcblk2 = "soc@0/30800000.bus/30b60000.mmc";
 			fstab {
@@ -87,7 +87,7 @@
 };
 
 / {
-	model = "FSL i.MX8MM EVK board";
+	model = "ENGICAM i.MX8MM i.CORE Starterkit";
 	compatible = "fsl,imx8mm-evk", "fsl,imx8mm";
 
 	chosen {
@@ -765,6 +765,18 @@
 	};
 };
 
+&usdhc1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc1>, <&pinctrl_usdhc1_gpio>;
+	cd-gpios = <&gpio1 6 GPIO_ACTIVE_LOW>;
+	max-frequency = <50000000>;
+	bus-width = <4>;
+	no-1-8-v;
+	pm-ignore-notify;
+	keep-power-in-suspend;
+	status = "okay";
+};
+
 &usdhc2 {
 	assigned-clocks = <&clk IMX8MM_CLK_USDHC2>;
 	assigned-clock-rates = <200000000>;
@@ -820,7 +832,6 @@
 
 	pinctrl_csi_rst: csi_rst_grp {
 		fsl,pins = <
-			MX8MM_IOMUXC_GPIO1_IO06_GPIO1_IO6		0x19
 			MX8MM_IOMUXC_GPIO1_IO14_CCMSRCGPCMIX_CLKO1	0x59
 		>;
 	};
@@ -1040,7 +1051,7 @@
 
 	pinctrl_usdhc1_gpio: usdhc1grpgpio {
 		fsl,pins = <
-			MX8MM_IOMUXC_SD1_RESET_B_GPIO2_IO10	0x41
+			MX8MM_IOMUXC_GPIO1_IO06_GPIO1_IO6	0x41
 		>;
 	};
 
@@ -1052,28 +1063,6 @@
 			MX8MM_IOMUXC_SD1_DATA1_USDHC1_DATA1	0x1d0
 			MX8MM_IOMUXC_SD1_DATA2_USDHC1_DATA2	0x1d0
 			MX8MM_IOMUXC_SD1_DATA3_USDHC1_DATA3	0x1d0
-		>;
-	};
-
-	pinctrl_usdhc1_100mhz: usdhc1grp100mhz {
-		fsl,pins = <
-			MX8MM_IOMUXC_SD1_CLK_USDHC1_CLK		0x194
-			MX8MM_IOMUXC_SD1_CMD_USDHC1_CMD		0x1d4
-			MX8MM_IOMUXC_SD1_DATA0_USDHC1_DATA0	0x1d4
-			MX8MM_IOMUXC_SD1_DATA1_USDHC1_DATA1	0x1d4
-			MX8MM_IOMUXC_SD1_DATA2_USDHC1_DATA2	0x1d4
-			MX8MM_IOMUXC_SD1_DATA3_USDHC1_DATA3	0x1d4
-		>;
-	};
-
-	pinctrl_usdhc1_200mhz: usdhc1grp200mhz {
-		fsl,pins = <
-			MX8MM_IOMUXC_SD1_CLK_USDHC1_CLK		0x196
-			MX8MM_IOMUXC_SD1_CMD_USDHC1_CMD		0x1d6
-			MX8MM_IOMUXC_SD1_DATA0_USDHC1_DATA0	0x1d6
-			MX8MM_IOMUXC_SD1_DATA1_USDHC1_DATA1	0x1d6
-			MX8MM_IOMUXC_SD1_DATA2_USDHC1_DATA2	0x1d6
-			MX8MM_IOMUXC_SD1_DATA3_USDHC1_DATA3	0x1d6
 		>;
 	};
 
