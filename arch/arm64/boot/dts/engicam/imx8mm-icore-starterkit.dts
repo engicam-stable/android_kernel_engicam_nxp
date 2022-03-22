@@ -88,7 +88,7 @@
 
 / {
 	model = "ENGICAM i.MX8MM i.CORE Starterkit";
-	compatible = "fsl,imx8mm-evk", "fsl,imx8mm";
+	compatible = "eng,imx8mm-icore", "fsl,imx8mm-evk", "fsl,imx8mm";
 
 	chosen {
 		stdout-path = &uart2;
@@ -140,12 +140,19 @@
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
-		regulator-name = "VSD_3V3";
+		regulator-name = "WLAN_REG_ON";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
-		off-on-delay-us = <20000>;
+		gpio = <&gpio3 23 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
+	};
+
+	bt_rfkill {
+		compatible = "fsl,mxc_bt_rfkill";
+		bt-power-gpios = <&gpio3 22 GPIO_ACTIVE_LOW>;
+		reset-delay-us = <20000>;
+		reset-post-delay-ms = <40>;
+		status ="okay";
 	};
 
 	bt_sco_codec: bt_sco_codec {
@@ -554,15 +561,6 @@
 	};
 };
 
-&micfil {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_pdm>;
-	assigned-clocks = <&clk IMX8MM_CLK_PDM>;
-	assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
-	assigned-clock-rates = <196608000>;
-	status = "okay";
-};
-
 &mipi_dsi {
        status = "okay";
 
@@ -652,21 +650,6 @@
 	status = "okay";
 };
 
-&sai5 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_sai5>;
-	assigned-clocks = <&clk IMX8MM_CLK_SAI5>;
-	assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
-	assigned-clock-rates = <49152000>;
-	clocks = <&clk IMX8MM_CLK_SAI5_IPG>, <&clk IMX8MM_CLK_DUMMY>,
-		<&clk IMX8MM_CLK_SAI5_ROOT>, <&clk IMX8MM_CLK_DUMMY>,
-		<&clk IMX8MM_CLK_DUMMY>, <&clk IMX8MM_AUDIO_PLL1_OUT>,
-		<&clk IMX8MM_AUDIO_PLL2_OUT>;
-	clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3", "pll8k", "pll11k";
-	fsl,sai-asynchronous;
-	status = "disabled";
-};
-
 &sai6 {
 	fsl,sai-monitor-spdif;
 	fsl,sai-asynchronous;
@@ -743,14 +726,20 @@
 &usdhc2 {
 	assigned-clocks = <&clk IMX8MM_CLK_USDHC2>;
 	assigned-clock-rates = <200000000>;
-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
-	cd-gpios = <&gpio1 15 GPIO_ACTIVE_LOW>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc2>;
 	bus-width = <4>;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
+	pm-ignore-notify;
+	keep-power-in-suspend;
+	non-removable;
 	status = "okay";
+	enable-sdio-wakeup;
+
+	brcmf: bcrmf@1 {
+		reg = <1>;
+		compatible = "brcm,bcm4329-fmac";
+	};	
 };
 
 &vpu_g1 {
@@ -886,18 +875,6 @@
 		>;
 	};
 
-	pinctrl_pdm: pdmgrp {
-		fsl,pins = <
-			MX8MM_IOMUXC_SAI5_MCLK_SAI5_MCLK	0xd6
-			MX8MM_IOMUXC_SAI5_RXC_PDM_CLK		0xd6
-			MX8MM_IOMUXC_SAI5_RXFS_SAI5_RX_SYNC	0xd6
-			MX8MM_IOMUXC_SAI5_RXD0_PDM_DATA0	0xd6
-			MX8MM_IOMUXC_SAI5_RXD1_PDM_DATA1	0xd6
-			MX8MM_IOMUXC_SAI5_RXD2_PDM_DATA2	0xd6
-			MX8MM_IOMUXC_SAI5_RXD3_PDM_DATA3	0xd6
-		>;
-	};
-
 	pinctrl_pmic: pmicirqgrp {
 		fsl,pins = <
 			MX8MM_IOMUXC_GPIO1_IO03_GPIO1_IO3		0x141
@@ -906,7 +883,8 @@
 
 	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
 		fsl,pins = <
-			MX8MM_IOMUXC_SD2_RESET_B_GPIO2_IO19	0x41
+			MX8MM_IOMUXC_SAI5_RXD2_GPIO3_IO23	0x1C0
+			MX8MM_IOMUXC_SAI5_RXD1_GPIO3_IO22	0x1C0
 		>;
 	};
 
@@ -962,18 +940,6 @@
 		>;
 	};
 
-	pinctrl_sai5: sai5grp {
-		fsl,pins = <
-			MX8MM_IOMUXC_SAI5_MCLK_SAI5_MCLK	0xd6
-			MX8MM_IOMUXC_SAI5_RXC_SAI5_RX_BCLK	0xd6
-			MX8MM_IOMUXC_SAI5_RXFS_SAI5_RX_SYNC	0xd6
-			MX8MM_IOMUXC_SAI5_RXD0_SAI5_RX_DATA0	0xd6
-			MX8MM_IOMUXC_SAI5_RXD1_SAI5_RX_DATA1    0xd6
-			MX8MM_IOMUXC_SAI5_RXD2_SAI5_RX_DATA2    0xd6
-			MX8MM_IOMUXC_SAI5_RXD3_SAI5_RX_DATA3    0xd6
-		>;
-	};
-
 	pinctrl_spdif1: spdif1grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_SPDIF_TX_SPDIF1_OUT	0xd6
@@ -1023,12 +989,6 @@
 		>;
 	};
 
-	pinctrl_usdhc2_gpio: usdhc2grpgpiogrp {
-		fsl,pins = <
-			MX8MM_IOMUXC_GPIO1_IO15_GPIO1_IO15	0x1c4
-		>;
-	};
-
 	pinctrl_usdhc2: usdhc2grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x190
@@ -1037,30 +997,6 @@
 			MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x1d0
 			MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x1d0
 			MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x1d0
-			MX8MM_IOMUXC_GPIO1_IO04_USDHC2_VSELECT	0x1d0
-		>;
-	};
-
-	pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
-		fsl,pins = <
-			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x194
-			MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x1d4
-			MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x1d4
-			MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x1d4
-			MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x1d4
-			MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x1d4
-			MX8MM_IOMUXC_GPIO1_IO04_USDHC2_VSELECT	0x1d0
-		>;
-	};
-
-	pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
-		fsl,pins = <
-			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x196
-			MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x1d6
-			MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x1d6
-			MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x1d6
-			MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x1d6
-			MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x1d6
 			MX8MM_IOMUXC_GPIO1_IO04_USDHC2_VSELECT	0x1d0
 		>;
 	};
