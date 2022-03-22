@@ -1205,9 +1205,9 @@ static int edt_ft5x06_ts_probe(struct i2c_client *client,
 	} else {
 		/* Unknown maximum values. Specify via devicetree */
 		input_set_abs_params(input, ABS_MT_POSITION_X,
-				     0, 65535, 0, 0);
+				     0, 1024, 0, 0);
 		input_set_abs_params(input, ABS_MT_POSITION_Y,
-				     0, 65535, 0, 0);
+				     0, 600, 0, 0);
 	}
 
 	touchscreen_parse_properties(input, true, &tsdata->prop);
@@ -1370,6 +1370,10 @@ static const struct edt_i2c_chip_data edt_ft6236_data = {
 	.max_support_points = 2,
 };
 
+static const struct edt_i2c_chip_data edt_ft5526_data = {
+	.max_support_points = 10,
+};
+
 static const struct i2c_device_id edt_ft5x06_ts_id[] = {
 	{ .name = "edt-ft5x06", .driver_data = (long)&edt_ft5x06_data },
 	{ .name = "edt-ft5506", .driver_data = (long)&edt_ft5506_data },
@@ -1385,6 +1389,7 @@ static const struct of_device_id edt_ft5x06_of_match[] = {
 	{ .compatible = "edt,edt-ft5306", .data = &edt_ft5x06_data },
 	{ .compatible = "edt,edt-ft5406", .data = &edt_ft5x06_data },
 	{ .compatible = "edt,edt-ft5506", .data = &edt_ft5506_data },
+	{ .compatible = "edt,edt-ft5x26", .data = &edt_ft5526_data },
 	{ .compatible = "evervision,ev-ft5726", .data = &edt_ft5506_data },
 	/* Note focaltech vendor prefix for compatibility with ft6236.c */
 	{ .compatible = "focaltech,ft6236", .data = &edt_ft6236_data },

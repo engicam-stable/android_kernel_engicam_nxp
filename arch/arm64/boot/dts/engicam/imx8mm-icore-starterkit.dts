@@ -434,6 +434,16 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c2>;
 	status = "okay";
+
+	polytouch: edt-ft5x26@38 {
+		compatible = "edt,edt-ft5x26";
+		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&edt_ft5x06_pins>;
+		interrupt-parent = <&gpio3>;
+		interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios= <&gpio1 8 GPIO_ACTIVE_LOW>;
+	};
 };
 
 &i2c3 {
@@ -736,6 +746,14 @@
 };
 
 &iomuxc {
+
+	edt_ft5x06_pins: edt-ft5x06-pins-grp{
+		fsl,pins = <
+			MX8MM_IOMUXC_SAI5_RXFS_GPIO3_IO19		0xc6
+			MX8MM_IOMUXC_GPIO1_IO08_GPIO1_IO8		0x19
+		>;
+	};
+
 	pinctrl_ir_recv: ir-recv {
 		fsl,pins = <
 			MX8MM_IOMUXC_GPIO1_IO13_GPIO1_IO13		0x4f
@@ -832,12 +850,6 @@
 		fsl,pins = <
 			MX8MM_IOMUXC_I2C4_SCL_I2C4_SCL			0x400001c3
 			MX8MM_IOMUXC_I2C4_SDA_I2C4_SDA			0x400001c3
-		>;
-	};
-
-	pinctrl_mipi_dsi_en: mipi_dsi_en {
-		fsl,pins = <
-			MX8MM_IOMUXC_GPIO1_IO08_GPIO1_IO8		0x16
 		>;
 	};
 
