@@ -90,6 +90,10 @@
 	model = "ENGICAM i.MX8MM i.CORE Starterkit";
 	compatible = "eng,imx8mm-icore", "fsl,imx8mm-evk", "fsl,imx8mm";
 
+	aliases {
+		rtc1 = &snvs_rtc;
+	};
+
 	chosen {
 		stdout-path = &uart2;
 	};
@@ -404,6 +408,11 @@
 		VDDA-supply = <&reg_3v3_avdd_sgtl>;
 		VDDIO-supply = <&reg_3v3_sgtl>;
 		VDDD-supply = <&reg_1v8_sgtl>;
+	};
+
+	pcf8523: rtc@68 {
+		compatible = "nxp,pcf8523";
+		reg = <0x68>;
 	};
 };
 
