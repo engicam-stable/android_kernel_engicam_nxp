@@ -347,7 +347,7 @@
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy1>;
 	fsl,magic-packet;
-	status = "okay";
+	status = "disabled";
 
 	mdio {
 		#address-cells = <1>;
@@ -500,6 +500,16 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c2>;
 	status = "okay";
+
+	polytouch: edt-ft5x06@38 {
+		compatible = "edt,edt-ft5x26";
+		reg = <0x38>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&edt_ft5x06_pins>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <9 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios= <&gpio1 13 GPIO_ACTIVE_LOW>;
+	};
 
 	ov5640_0: ov5640_mipi@3c {
 		compatible = "ovti,ov5640";
@@ -851,6 +861,13 @@
 	pinctrl_pwm4: pwm4grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SAI5_RXFS__PWM4_OUT	0x116
+		>;
+	};
+
+	edt_ft5x06_pins: edt-ft5x06-pins-grp{
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI1_RXD7__GPIO4_IO09		0x141
+			MX8MP_IOMUXC_GPIO1_IO13__GPIO1_IO13		0x141
 		>;
 	};
 
