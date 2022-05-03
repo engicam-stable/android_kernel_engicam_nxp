@@ -232,6 +232,33 @@
 				    100>;
 		default-brightness-level = <80>;
 	};
+
+	panel_lvds: panel-lvds {
+		compatible = "panel-lvds";
+
+		width-mm = <210>;
+		height-mm = <158>;
+		data-mapping = "vesa-24";
+		status = "okay";
+
+		panel-timing {
+			clock-frequency = <50000000>;
+			hactive = <1024>;
+			vactive = <600>;
+			hsync-len = <20>;
+			hfront-porch = <150>;
+			hback-porch = <150>;
+			vfront-porch = <15>;
+			vback-porch = <15>;
+			vsync-len = <5>;
+		};
+
+		port {
+			panel_lvds_in: endpoint {
+				remote-endpoint = <&lvds_out>;
+			};
+		};
+	};
 };
 
 &A53_0 {
@@ -474,32 +501,6 @@
 	pinctrl-0 = <&pinctrl_i2c2>;
 	status = "okay";
 
-	adv_bridge: adv7535@3d {
-		compatible = "adi,adv7535";
-		reg = <0x3d>;
-		adi,addr-cec = <0x3b>;
-		adi,dsi-lanes = <4>;
-		status = "okay";
-
-		port {
-			adv7535_from_dsim: endpoint {
-				remote-endpoint = <&dsim_to_adv7535>;
-			};
-		};
-	};
-
-	lvds_bridge: lvds-to-hdmi-bridge@4c {
-		compatible = "ite,it6263";
-		reg = <0x4c>;
-		reset-gpios = <&gpio1 10 GPIO_ACTIVE_LOW>;
-
-		port {
-			it6263_in: endpoint {
-				remote-endpoint = <&lvds_out>;
-			};
-		};
-	};
-
 	ov5640_0: ov5640_mipi@3c {
 		compatible = "ovti,ov5640";
 		reg = <0x3c>;
@@ -620,7 +621,7 @@
 	status = "okay";
 
 	lvds-channel@0 {
-		fsl,data-mapping = "jeida";
+		fsl,data-mapping = "spwg";
 		fsl,data-width = <24>;
 		status = "okay";
 
@@ -628,7 +629,7 @@
 			reg = <1>;
 
 			lvds_out: endpoint {
-				remote-endpoint = <&it6263_in>;
+				remote-endpoint = <&panel_lvds_in>;
 			};
 		};
 	};
@@ -636,17 +637,6 @@
 
 &ldb_phy {
 	status = "okay";
-};
-
-&mipi_dsi {
-	status = "okay";
-
-	port@1 {
-		dsim_to_adv7535: endpoint {
-			remote-endpoint = <&adv7535_from_dsim>;
-			attach-bridge;
-		};
-	};
 };
 
 &snvs_pwrkey {
