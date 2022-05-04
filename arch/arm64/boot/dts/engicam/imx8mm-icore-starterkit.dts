@@ -168,7 +168,7 @@
 
 	sound {
 		compatible = "simple-audio-card";
-		simple-audio-card,name = "imx8mm-sgtl5000";
+		simple-audio-card,name = "imx8-sgtl5000";
 		simple-audio-card,format = "i2s";
 		simple-audio-card,bitclock-master = <&dailink_master>;
 		simple-audio-card,frame-master = <&dailink_master>;
